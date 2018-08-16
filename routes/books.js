@@ -17,9 +17,8 @@ router.get('/', function(req, res, next) {
 
 /* POST create article. */
 router.post('/', function(req, res, next) {
-  Book.create(req.body).then(function(book){
-    res.redirect("/books");
-      // res.redirect("/books/" + book.id);
+  Loan.create(req.body).then(function(loan){
+    res.redirect(`/loans/${loan.id}`);
   });
 });
 

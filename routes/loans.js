@@ -25,33 +25,36 @@ function getLoans(filter) {
 
 
 
-function getAvailableBooks(){
+// function getAvailableBooks(){
+//
+//   getLoans("checkedout").then(function(checkedout){
+//
+//   })
+//
+//   return Book.findAll();
+// }
 
-  getLoans("checkedout").then(function(checkedout){
-    
-  })
-
-  return Book.findAll();
-}
-
-/* GET articles listing. */
+/* GET loans listing. */
 router.get('/', function(req, res, next) {
   getLoans(req.query.filter).then(function(loans){
     res.render("loans/index", {loans: loans});
   })
 });
 
-/* POST create article. */
+/* POST create loan. */
 router.post('/', function(req, res, next) {
-  Book.create(req.body).then(function(book){
-    res.redirect("/books");
-      // res.redirect("/books/" + book.id);
+  Loan.create(req.body).then(function(loan){
+    res.redirect("/loans");
   });
 });
 
 /* Create a new article form. */
 router.get('/new', function(req, res, next) {
-  res.render("books/new", {book: Book.build(), button_text: "Create New Book"});
+  Book.findAll().then(function(books){
+    Patron.findAll().then(function(patrons){
+        res.render("loans/new", {loan: Loan.build(), books: books, patrons:patrons, button_text: "Create New Loan"});
+    })
+  })
 });
 
 /* Edit article form. */
@@ -73,8 +76,12 @@ router.get("/:id/delete", function(req, res, next){
 
 /* GET individual article. */
 router.get("/:id", function(req, res, next){
-  Book.findById(req.params.id).then(function(book){
-      res.render("books/show", {book: book, button_text: "Edit"});
+  Loan.findById(req.params.id).then(function(loan){
+    Book.findById(loan.book_id).then(function(book){
+      Patron.findById(loan.patron_id).then(function(patron){
+        res.render("loans/show", {loan: loan, button_text: "Edit"});
+      })
+    })
   });
 });
 

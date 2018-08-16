@@ -17,7 +17,7 @@ router.get('/', function(req, res, next) {
 /* POST create article. */
 router.post('/', function(req, res, next) {
   Patron.create(req.body).then(function(patron){
-    res.redirect("/patrons");
+    res.redirect(`/patrons/${patron.id}`);
   });
 });
 
