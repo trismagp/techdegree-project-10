@@ -8,8 +8,9 @@ var Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
 
-// TODO: return book
-// TODO: new loan
+// TODO: return laon
+// TODO: edit, delete loan
+// TODO: filter checked out books in loan form
 // TODO: title
 
 function getLoans(filter) {
@@ -57,6 +58,18 @@ router.get('/new', function(req, res, next) {
   })
 });
 
+/* Return loan form. */
+router.get("/:id/return", function(req, res, next){
+  Loan.findById(req.params.id).then(function(loan){
+    Book.findById(loan.book_id).then(function(book){
+      Patron.findById(loan.patron_id).then(function(patron){
+        res.render("loans/return", {loan: loan, book: book, patron:patron, button_text: "Return book"});
+      })
+    })
+  })
+});
+
+
 /* Edit article form. */
 router.get("/:id/edit", function(req, res, next){
   Book.findById(req.params.id).then(function(book){
@@ -87,10 +100,10 @@ router.get("/:id", function(req, res, next){
 
 /* PUT update article. */
 router.put("/:id", function(req, res, next){
-  Book.findById(req.params.id).then(function(book){
-    return book.update(req.body);
-  }).then(function(book){
-      res.redirect("/books/" + book.id);
+  Loan.findById(req.params.id).then(function(loan){
+    return loan.update(req.body);
+  }).then(function(loan){
+      res.redirect("/loans");
   });
 });
 

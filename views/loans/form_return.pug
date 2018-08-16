@@ -1,0 +1,17 @@
+p
+  label(for="book_id") Book Title: 
+  span= book.title
+p
+  label(for="patron_id") Loaned By:
+  span #{patron.first_name} #{patron.last_name}
+p
+  label(for="loaned_on") Loaned On: 
+  span= loan.loaned_on
+p
+  label(for="return_by") Return By:
+  span= loan.return_by
+p
+  label(for="returned_on") Returned on:
+  input(name="returned_on", id="returned_on", type="text", value=loan.returned_on)
+p
+  input(type="submit" value=button_text)
