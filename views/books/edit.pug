@@ -1,0 +1,5 @@
+extends book_layout
+
+block content_book
+  form(action="/books/"+ book.id + "?_method=PUT", method="post")
+    include form

@@ -1,0 +1,30 @@
+extends ../layout
+
+block content
+  h1 Patron: #{patron.first_name} #{patron.last_name}
+  block content_patron
+  
+  h2 Loan History
+  table
+    thead
+      tr
+        th Book
+        th Patron 
+        th Loaned on
+        th Return by 
+        th Returned on
+        th Action
+    tbody
+        if loans
+          each loan in loans
+            tr
+              td 
+                a(href=`/books/${loan.dataValues.Book.dataValues.id}`)= loan.dataValues.Book.dataValues.title
+              td 
+                a(href="#") #{patron.first_name} #{patron.last_name} 
+              td= loan.loaned_on
+              td= loan.return_by
+              td= loan.returned_on 
+              td
+                if !loan.returned_on 
+                  a(href="return_book.html" class="button") Return Book

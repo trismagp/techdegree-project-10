@@ -1,0 +1,18 @@
+extends book_layout
+
+block content_book
+  form(action="/books/"+ book.id + "/edit", method="get")
+    p
+      label(for="title") Title
+      span= book.title
+    p
+      label(for="author") Author
+      span= book.author
+    p
+      label(for="genre") Genre
+      span= book.genre
+    p
+      label(for="first_published") First Published
+      span= book.first_published
+    p
+      input(type="submit" value=button_text)

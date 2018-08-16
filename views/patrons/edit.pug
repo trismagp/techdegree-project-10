@@ -1,0 +1,5 @@
+extends patron_layout
+
+block content_patron
+  form(action="/patrons/"+ patron.id + "?_method=PUT", method="post")
+    include form

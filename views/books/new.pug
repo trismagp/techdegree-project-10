@@ -1,0 +1,9 @@
+extends ../layout
+
+block content
+  h1 Book: A Brief History of Time
+  
+  include errors
+  
+  form(action="/books", method="post")
+    include form

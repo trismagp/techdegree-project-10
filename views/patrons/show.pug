@@ -1,0 +1,24 @@
+extends patron_layout
+
+block content_patron
+  form(action="/patrons/"+ patron.id + "/edit", method="get")
+    p
+      label(for="first_name") First name
+      span= patron.first_name
+    p
+      label(for="last_name") Last name
+      span= patron.last_name
+    p
+      label(for="address") Address
+      span= patron.address  
+    p
+      label(for="email") Email
+      span= patron.email  
+    p
+      label(for="library_id") Library ID
+      span= patron.library_id  
+    p
+      label(for="zip_code") Zip Code
+      span= patron.zip_code  
+    p
+      input(type="submit" value=button_text)

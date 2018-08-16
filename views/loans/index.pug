@@ -1,0 +1,40 @@
+extends ../layout
+
+//- https://stackoverflow.com/questions/30452977/sequelize-query-compare-dates-in-two-columns
+
+block content
+  h1 Loans
+  p
+    a(href="/loans/new", class="button") Create New Loan
+  p Filters 
+    a(href="/loans") All 
+    | |
+    a(href="/loans?filter=overdue")  Overdue 
+    | |
+    a(href="/loans?filter=checkedout")  Checked Out 
+    
+  table
+    thead
+      tr
+        th Book
+        th Patron 
+        th Loaned on
+        th Return by 
+        th Returned on
+        th Action
+        
+    tbody
+      each loan in loans
+        tr
+          td
+            a(href=`/books/${loan.dataValues.Book.dataValues.id}`)= loan.dataValues.Book.dataValues.title
+          td
+            a(href=`/patrons/${loan.dataValues.Patron.dataValues.id}`) #{loan.dataValues.Patron.dataValues.first_name} #{loan.dataValues.Patron.dataValues.last_name} 
+          td= loan.loaned_on
+          td= loan.return_by
+          td= loan.returned_on
+          td
+            if !loan.returned_on
+              a(href="return_book.html" class="button") Return Book
+          
+  

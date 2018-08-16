@@ -1,0 +1,9 @@
+extends ../layout
+
+block content
+  h1 Patron: #{patron.last_name} #{patron.first_name}
+  
+  include errors
+  
+  form(action="/patrons", method="post")
+    include form
