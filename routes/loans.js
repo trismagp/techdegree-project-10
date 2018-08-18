@@ -13,9 +13,20 @@ var dateFormat = require('dateformat');
 /* GET loans listing. */
 router.get('/', function(req, res, next) {
   Loan.getLoans(req.query.filter).then(function(loans){
-    res.render("loans/index", {loans: loans});
+    let title = "Loans";
+    if(req.query.filter){
+      if(req.query.filter === "checkedout"){
+        title = "Checked Out Loans";
+      }
+      if(req.query.filter === "overdue"){
+        title = "Overdue Loans";
+      }
+    }
+    res.render("loans/index", {loans: loans, title: title});
   })
 });
+
+
 
 /* POST create loan. */
 router.post('/', function(req, res, next) {
@@ -24,42 +35,29 @@ router.post('/', function(req, res, next) {
   });
 });
 
+
+// TODO: filter checkedout books
 /* Create a new article form. */
 router.get('/new', function(req, res, next) {
   Book.findAll().then(function(books){
     Patron.findAll().then(function(patrons){
-        res.render("loans/new", {loan: Loan.build(), books: books, patrons:patrons, button_text: "Create New Loan"});
+        res.render("loans/new", {loan: Loan.build(), books: books, patrons:patrons, button_text: "Create New Loan", title: "New Loan"});
     })
   })
 });
 
+// TODO: filter checkedout books
 /* Return loan form. */
 router.get("/:id/return", function(req, res, next){
   Loan.findById(req.params.id).then(function(loan){
     Book.findById(loan.book_id).then(function(book){
       Patron.findById(loan.patron_id).then(function(patron){
-        res.render("loans/return", {loan: loan, book: book, patron:patron, button_text: "Return book"});
+        res.render("loans/return", {redirect_route:`/loans/${req.params.id}`, loan: loan, book: book, patron:patron, button_text: "Return book"});
       })
     })
   })
 });
 
-
-/* Edit article form. */
-router.get("/:id/edit", function(req, res, next){
-  Book.findById(req.params.id).then(function(book){
-    res.render("books/edit", {book: book, button_text: "Update"});
-  })
-});
-
-
-/* Delete article form. */
-router.get("/:id/delete", function(req, res, next){
-  Article.findById(req.params.id).then(function(article){
-    res.render("articles/delete", {article: article, title: "Delete Article"});
-  })
-
-});
 
 
 /* GET individual article. */

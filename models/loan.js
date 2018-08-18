@@ -17,8 +17,16 @@ module.exports = (sequelize, DataTypes) => {
 
   Loan.getLoans = function(filter) {
     var whereObj = {};
-    if(filter === "checkedout") whereObj = {returned_on : null }
-    if(filter === "overdue") whereObj = {[sequelize.Op.and]: [{returned_on : null},{return_by : {[sequelize.Op.lt]: sequelize.literal('CURRENT_DATE')}}] }
+    if(filter === "checkedout"){
+      whereObj = {returned_on : null }
+    } else if(filter === "overdue"){
+      whereObj = {[sequelize.Op.and]: [{returned_on : null},{return_by : {[sequelize.Op.lt]: sequelize.literal('CURRENT_DATE')}}] }
+    }else if(filter){
+      if( filter.length > 0){
+        // not returning any value if filter is not null and different from checkedout or overdue
+        whereObj = { id : null }
+      }
+    }
 
     return Loan.findAll({
       include: [{all:true}],

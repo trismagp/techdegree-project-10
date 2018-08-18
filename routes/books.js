@@ -11,14 +11,16 @@ var dateFormat = require('dateformat');
 /* GET books listing. */
 router.get('/', function(req, res, next) {
   if(req.query.filter){
-    // filtering checked out or overdue books
+    // filtering checked out or overdue books for the following routes:
+    // 1. /books?filter=checkedout
+    // 2. /books?filter=ouverdue
     Loan.getLoans(req.query.filter).then(function(filteredLoans){
       let books = filteredLoans.map(loan => loan.dataValues.Book.dataValues);
-      res.render("books/index", {books: books});
+      res.render("books/index", {books: books, title: req.query.filter === "checkedout" ? "Checked Out Books" : "Overdue Books"});
     });
   }else{
     Book.findAll().then(function(books){
-      res.render("books/index", {books: books});
+      res.render("books/index", {books: books, title: "Books"});
     });
   }
 });
@@ -32,7 +34,7 @@ router.post('/', function(req, res, next) {
 
 /* Create a new article form. */
 router.get('/new', function(req, res, next) {
-  res.render("books/new", {book: Book.build(), button_text: "Create New Book"});
+  res.render("books/new", {book: Book.build(), button_text: "Create New Book", title: "New Book"});
 });
 
 /* Edit article form. */
@@ -57,7 +59,7 @@ router.get("/:id/delete", function(req, res, next){
 router.get("/:id", function(req, res, next){
   Book.findById(req.params.id).then(function(book){
     Loan.findAll({ include: [{model:Patron}], where: {book_id:req.params.id}}).then(function(loans){
-      res.render("books/show", {book: book, loans: loans, button_text: "Edit"});
+      res.render("books/show", {book: book, loans: loans, button_text: "Edit", title: book.title});
     })
   });
 });
@@ -70,6 +72,23 @@ router.put("/:id", function(req, res, next){
       res.redirect("/books/" + book.id);
   });
 });
+
+router.put("/:id/return", function(req, res, next){
+  Loan.getLoans("checkedout").then(function(checkedoutLoans){
+    let loan = checkedoutLoans.filter(loan => loan.dataValues.Book.dataValues.id === parseInt(req.params.id))[0];
+    return loan.update(req.body);
+  }).then(function(book){
+      res.redirect("/books/" + req.params.id);
+  });
+});
+
+router.get("/:id/return", function(req, res, next){
+  Loan.getLoans("checkedout").then(function(checkedoutLoans){
+    let loan = checkedoutLoans.filter(loan => loan.dataValues.Book.dataValues.id === parseInt(req.params.id))[0];
+    res.render("loans/return", {redirect_route:`/books/${req.params.id}/return` ,loan: loan, book: loan.dataValues.Book, patron: loan.dataValues.Patron, button_text: "Return book", title: "Return book"});
+  });
+});
+
 
 /* DELETE individual article. */
 router.delete("/:id", function(req, res, next){

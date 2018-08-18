@@ -10,7 +10,7 @@ var dateFormat = require('dateformat');
 /* GET articles listing. */
 router.get('/', function(req, res, next) {
   Patron.findAll().then(function(patrons){
-    res.render("patrons/index", {patrons: patrons});
+    res.render("patrons/index", {patrons: patrons, title: "Patrons"});
   })
 });
 
@@ -23,14 +23,14 @@ router.post('/', function(req, res, next) {
 
 /* Create a new article form. */
 router.get('/new', function(req, res, next) {
-  res.render("patrons/new", {patron: Patron.build(), button_text: "Create New Patron"});
+  res.render("patrons/new", {patron: Patron.build(), button_text: "Create New Patron", title: "New Patron"});
 });
 
 /* Edit article form. */
 router.get("/:id/edit", function(req, res, next){
   Patron.findById(req.params.id).then(function(patron){
     Loan.findAll({ include: [{model:Book}], where: {patron_id:req.params.id}}).then(function(loans){
-      res.render("patrons/edit", {patron: patron, loans: loans, button_text: "Save"});
+      res.render("patrons/edit", {patron: patron, loans: loans, button_text: "Save", title: `${patron.first_name} ${patron.last_name}`});
     });
   });
 });
@@ -40,7 +40,7 @@ router.get("/:id/edit", function(req, res, next){
 router.get("/:id", function(req, res, next){
   Patron.findById(req.params.id).then(function(patron){
     Loan.findAll({ include: [{model:Book}], where: {patron_id:req.params.id}}).then(function(loans){
-      res.render("patrons/show", {patron: patron, loans: loans, button_text: "Edit"});
+      res.render("patrons/show", {patron: patron, loans: loans, button_text: "Edit", title: `${patron.first_name} ${patron.last_name}`});
     });
   });
 });

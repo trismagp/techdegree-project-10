@@ -1,5 +1,5 @@
 extends loan_layout
 
 block content_loan
-  form(action="/loans/"+ loan.id + "?_method=PUT", method="post")
+  form(action= redirect_route + "?_method=PUT", method="post")
     include form_return
