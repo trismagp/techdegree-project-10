@@ -73,20 +73,19 @@ router.put("/:id", function(req, res, next){
   });
 });
 
-router.put("/:id/return", function(req, res, next){
-  Loan.getLoans("checkedout").then(function(checkedoutLoans){
-    let loan = checkedoutLoans.filter(loan => loan.dataValues.Book.dataValues.id === parseInt(req.params.id))[0];
+router.put("/:bookId/loans/:loanId/return", function(req, res, next){
+  Loan.findById(req.params.loanId).then(function(loan){
     return loan.update(req.body);
   }).then(function(book){
-    res.redirect("/books/" + req.params.id);
+    res.redirect("/books/" + req.params.bookId);
   });
 });
 
-router.get("/:id/return", function(req, res, next){
+router.get("/:bookId/loans/:loadId/return", function(req, res, next){
   Loan.getLoans("checkedout").then(function(checkedoutLoans){
-    let loan = checkedoutLoans.filter(loan => loan.dataValues.Book.dataValues.id === parseInt(req.params.id))[0];
+    let loan = checkedoutLoans.filter(loan => loan.dataValues.Book.dataValues.id === parseInt(req.params.bookId))[0];
     let { Book, Patron} = loan.dataValues;
-    res.render("loans/return", {redirect_route:`/books/${req.params.id}/return`, loan: loan, book: Book, patron: Patron, button_text: "Return book", title: "Return book"});
+    res.render("loans/return", {redirect_route:`/books/${req.params.bookId}/loans/${req.params.loadId}/return`, loan: loan, book: Book, patron: Patron, button_text: "Return book", title: "Return book"});
   });
 });
 

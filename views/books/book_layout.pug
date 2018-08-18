@@ -15,9 +15,9 @@ block content
         th Returned on
         th Action
       tbody
-        tr
-          if loans
-            each loan in loans
+        if loans
+          each loan in loans
+            tr
               td 
                 a(href=`/books/${book.id}`)= book.title
               td 
@@ -27,4 +27,4 @@ block content
               td= loan.returned_on 
               td
                 if !loan.returned_on 
-                  a(href=`/books/${book.id}/return` class="button") Return Book
+                  a(href=`/books/${book.id}/loans/${loan.id}/return` class="button") Return Book
