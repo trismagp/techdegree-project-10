@@ -4,40 +4,15 @@ var Loan = require("../models").Loan;
 var Book = require("../models").Book;
 var Patron = require("../models").Patron;
 var dateFormat = require('dateformat');
-var Sequelize = require('sequelize');
-const Op = Sequelize.Op;
 
-
-// TODO: return laon
 // TODO: edit, delete loan
 // TODO: filter checked out books in loan form
 // TODO: title
-
-function getLoans(filter) {
-  var whereObj = {};
-  if(filter === "checkedout") whereObj = {returned_on : null }
-  if(filter === "overdue") whereObj = {[Op.and]: [{returned_on : null},{return_by : {[Op.lt]: Sequelize.literal('CURRENT_DATE')}}] }
-
-  return Loan.findAll({
-    include: [{all:true}],
-    where: [whereObj]
-  })
-}
-
-
-
-// function getAvailableBooks(){
-//
-//   getLoans("checkedout").then(function(checkedout){
-//
-//   })
-//
-//   return Book.findAll();
-// }
+// TODO: check form error
 
 /* GET loans listing. */
 router.get('/', function(req, res, next) {
-  getLoans(req.query.filter).then(function(loans){
+  Loan.getLoans(req.query.filter).then(function(loans){
     res.render("loans/index", {loans: loans});
   })
 });

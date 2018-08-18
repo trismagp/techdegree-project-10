@@ -1,4 +1,6 @@
 'use strict';
+
+
 module.exports = (sequelize, DataTypes) => {
   var Book = sequelize.define('Book', {
     title: DataTypes.STRING,
@@ -11,5 +13,8 @@ module.exports = (sequelize, DataTypes) => {
   Book.associate = function(models) {
     // associations can be defined here
   };
+
+
+
   return Book;
 };

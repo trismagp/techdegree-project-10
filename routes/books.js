@@ -8,17 +8,25 @@ var dateFormat = require('dateformat');
 // TODO: return book
 // TODO: link patron
 
-/* GET articles listing. */
+/* GET books listing. */
 router.get('/', function(req, res, next) {
-  Book.findAll().then(function(books){
-    res.render("books/index", {books: books});
-  })
+  if(req.query.filter){
+    // filtering checked out or overdue books
+    Loan.getLoans(req.query.filter).then(function(filteredLoans){
+      let books = filteredLoans.map(loan => loan.dataValues.Book.dataValues);
+      res.render("books/index", {books: books});
+    });
+  }else{
+    Book.findAll().then(function(books){
+      res.render("books/index", {books: books});
+    });
+  }
 });
 
-/* POST create article. */
+/* POST create book. */
 router.post('/', function(req, res, next) {
-  Loan.create(req.body).then(function(loan){
-    res.redirect(`/loans/${loan.id}`);
+  Book.create(req.body).then(function(book){
+    res.redirect(`/books/${book.id}`);
   });
 });
 
