@@ -35,13 +35,20 @@ router.post('/', function(req, res, next) {
   });
 });
 
-
-// TODO: filter checkedout books
 /* Create a new article form. */
 router.get('/new', function(req, res, next) {
-  Book.findAll().then(function(books){
-    Patron.findAll().then(function(patrons){
-        res.render("loans/new", {loan: Loan.build(), books: books, patrons:patrons, button_text: "Create New Loan", title: "New Loan"});
+  Loan.getLoans("checkedout").then(function(checkedoutLoans){
+    let checkedoutBookIds = [];
+    checkedoutLoans.map(loan => checkedoutBookIds.push(loan.dataValues.Book.dataValues.id));
+    Book.findAll().then(function(books){
+      let availableBooks = books;
+      if (checkedoutBookIds.length > 0) {
+        availableBooks = books.filter(book => !checkedoutBookIds.includes(book.id));
+      }
+
+      Patron.findAll().then(function(patrons){
+          res.render("loans/new", {loan: Loan.build(), books: availableBooks, patrons:patrons, button_text: "Create New Loan", title: "New Loan"});
+      })
     })
   })
 });

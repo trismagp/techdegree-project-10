@@ -85,7 +85,17 @@ router.get("/:bookId/loans/:loadId/return", function(req, res, next){
   Loan.getLoans("checkedout").then(function(checkedoutLoans){
     let loan = checkedoutLoans.filter(loan => loan.dataValues.Book.dataValues.id === parseInt(req.params.bookId))[0];
     let { Book, Patron} = loan.dataValues;
-    res.render("loans/return", {redirect_route:`/books/${req.params.bookId}/loans/${req.params.loadId}/return`, loan: loan, book: Book, patron: Patron, button_text: "Return book", title: "Return book"});
+    res.render(
+      "loans/return",
+      {
+        redirect_route:`/books/${req.params.bookId}/loans/${req.params.loadId}/return`,
+        loan: loan,
+        book: Book,
+        patron: Patron,
+        button_text: "Return book",
+        title: "Return book"
+      }
+    );
   });
 });
 
