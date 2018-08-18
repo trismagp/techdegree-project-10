@@ -45,9 +45,24 @@ router.get('/new', function(req, res, next) {
       if (checkedoutBookIds.length > 0) {
         availableBooks = books.filter(book => !checkedoutBookIds.includes(book.id));
       }
-
       Patron.findAll().then(function(patrons){
-          res.render("loans/new", {loan: Loan.build(), books: availableBooks, patrons:patrons, button_text: "Create New Loan", title: "New Loan"});
+        let now = new Date();
+        let loanedOn = dateFormat(now, "yyyy-mm-dd");
+        var returnBy = new Date();
+        // returnBy is today + 7 days
+        returnBy = dateFormat(returnBy.setDate(now.getDate() + 7), "yyyy-mm-dd");
+        res.render(
+          "loans/new",
+          {
+            loan: Loan.build(),
+            books: availableBooks,
+            patrons:patrons,
+            loaned_on : loanedOn,
+            return_by : returnBy,
+            button_text: "Create New Loan",
+            title: "New Loan"
+          }
+        );
       })
     })
   })
