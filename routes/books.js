@@ -78,21 +78,21 @@ router.put("/:id/return", function(req, res, next){
     let loan = checkedoutLoans.filter(loan => loan.dataValues.Book.dataValues.id === parseInt(req.params.id))[0];
     return loan.update(req.body);
   }).then(function(book){
-      res.redirect("/books/" + req.params.id);
+    res.redirect("/books/" + req.params.id);
   });
 });
 
 router.get("/:id/return", function(req, res, next){
   Loan.getLoans("checkedout").then(function(checkedoutLoans){
     let loan = checkedoutLoans.filter(loan => loan.dataValues.Book.dataValues.id === parseInt(req.params.id))[0];
-    res.render("loans/return", {redirect_route:`/books/${req.params.id}/return` ,loan: loan, book: loan.dataValues.Book, patron: loan.dataValues.Patron, button_text: "Return book", title: "Return book"});
+    let { Book, Patron} = loan.dataValues;
+    res.render("loans/return", {redirect_route:`/books/${req.params.id}/return`, loan: loan, book: Book, patron: Patron, button_text: "Return book", title: "Return book"});
   });
 });
 
 
 /* DELETE individual article. */
 router.delete("/:id", function(req, res, next){
-
   Article.findById(req.params.id).then(function(article){
     return article.destroy();
   }).then(function(){

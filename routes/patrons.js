@@ -55,4 +55,21 @@ router.put("/:id", function(req, res, next){
 });
 
 
+router.put("/:patronId/loans/:loanId/return", function(req, res, next){
+  Loan.findById(req.params.loanId).then(function(loan){
+    return loan.update(req.body);
+  }).then(function(book){
+    res.redirect("/patrons/" + req.params.patronId);
+  });
+});
+
+router.get("/:patronId/loans/:loanId/return", function(req, res, next){
+  Loan.getLoans("checkedout").then(function(checkedoutLoans){
+    let loan = checkedoutLoans.filter(loan => loan.dataValues.Patron.dataValues.id === parseInt(req.params.patronId))[0];
+    let { Book, Patron} = loan.dataValues;
+    res.render("loans/return", {redirect_route:`/patrons/${req.params.patronId}/loans/${req.params.loanId}/return`, loan: loan, book: Book, patron: Patron, button_text: "Return book", title: "Return book"});
+  });
+});
+
+
 module.exports = router;
