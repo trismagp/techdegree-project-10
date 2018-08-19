@@ -122,8 +122,7 @@ router.put("/:bookId/loans/:loanId/return", function(req, res, next){
     res.redirect("/books/" + req.params.bookId);
   }).catch(function(err){
     if(err.name === "SequelizeValidationError"){
-      console.log(err.errors);
-        renderReturnBookLoanForm(req, res, next, err.errors);
+      renderReturnBookLoanForm(req, res, next, err.errors);
     }else{
       throw err;
     }
@@ -133,8 +132,7 @@ router.put("/:bookId/loans/:loanId/return", function(req, res, next){
 });
 
 function renderReturnBookLoanForm(req, res, next, errors){
-  Loan.getLoans("checkedout").then(function(checkedoutLoans){
-    let loan = checkedoutLoans.filter(loan => loan.dataValues.Book.dataValues.id === parseInt(req.params.bookId))[0];
+  Loan.getCheckedOutLoan(req.params.loanId).then(function(loan){
     if (loan) {
       let now = new Date();
       loan.returned_on = dateFormat(now, "yyyy-mm-dd");

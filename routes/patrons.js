@@ -106,14 +106,21 @@ router.put("/:patronId/loans/:loanId/return", function(req, res, next){
   }).then(function(book){
     res.redirect("/patrons/" + req.params.patronId);
   }).catch(function(err){
+    if(err.name === "SequelizeValidationError"){
+      renderReturnPatronLoanForm(req, res, next, err.errors);
+    }else{
+      throw err;
+    }
+  }).catch(function(err){
     res.send(500);
   });
 });
 
-router.get("/:patronId/loans/:loanId/return", function(req, res, next){
-  Loan.getLoans("checkedout").then(function(checkedoutLoans){
-    let loan = checkedoutLoans.filter(loan => loan.dataValues.Patron.dataValues.id === parseInt(req.params.patronId))[0];
+function renderReturnPatronLoanForm(req, res, next, errors){
+  Loan.getCheckedOutLoan(req.params.loanId).then(function(loan){
     if(loan){
+      let now = new Date();
+      loan.returned_on = dateFormat(now, "yyyy-mm-dd");
       let { Book, Patron} = loan.dataValues;
       res.render(
         "loans/return",
@@ -123,7 +130,8 @@ router.get("/:patronId/loans/:loanId/return", function(req, res, next){
           book: Book,
           patron: Patron,
           button_text: "Return book",
-          title: "Return book"
+          title: "Return book",
+          errors: errors
         }
       );
     }else{
@@ -131,9 +139,11 @@ router.get("/:patronId/loans/:loanId/return", function(req, res, next){
     }
   }).catch(function(err){
     res.send(500);
-  }).catch(function(err){
-    res.send(500);
   });
+}
+
+router.get("/:patronId/loans/:loanId/return", function(req, res, next){
+  renderReturnPatronLoanForm(req, res, next, null);
 });
 
 
