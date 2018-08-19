@@ -23,6 +23,8 @@ router.get('/', function(req, res, next) {
       }
     }
     res.render("loans/index", {loans: loans, title: title});
+  }).catch(function(err){
+    res.send(500);
   })
 });
 
@@ -32,10 +34,16 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
   Loan.create(req.body).then(function(loan){
     res.redirect("/loans");
+  }).catch(function(err){
+    res.send(500);
   });
 });
 
-/* Create a new article form. */
+// Before displaying the new loan form,
+// 1. the checked out book ids are fetch with Loan.getLoans("checkedout") then listed in "checkedoutBookIds"
+// 2. all books are filtered with checkedoutBookIds and we get the "availableBooks" array
+// 3. all patrons are fetched and listed in "patrons"
+// 4. "availableBooks" and "patrons" are sent to the new loan form for the selectors
 router.get('/new', function(req, res, next) {
   Loan.getLoans("checkedout").then(function(checkedoutLoans){
     let checkedoutBookIds = [];
@@ -63,54 +71,53 @@ router.get('/new', function(req, res, next) {
             title: "New Loan"
           }
         );
+      }).catch(function(err){
+        res.send(500);
       })
+    }).catch(function(err){
+      res.send(500);
     })
+  }).catch(function(err){
+    res.send(500);
   })
 });
 
-// TODO: filter checkedout books
-/* Return loan form. */
+// can only return a loan that has no returned_on date
+// therefor using Loan.getCheckedOutLoan to retrieve a loan
 router.get("/:id/return", function(req, res, next){
-  Loan.findById(req.params.id).then(function(loan){
-    Book.findById(loan.book_id).then(function(book){
-      Patron.findById(loan.patron_id).then(function(patron){
-        res.render("loans/return", {redirect_route:`/loans/${req.params.id}`, loan: loan, book: book, patron:patron, button_text: "Return book"});
-      })
-    })
-  })
-});
-
-
-
-/* GET individual article. */
-router.get("/:id", function(req, res, next){
-  Loan.findById(req.params.id).then(function(loan){
-    Book.findById(loan.book_id).then(function(book){
-      Patron.findById(loan.patron_id).then(function(patron){
-        res.render("loans/show", {loan: loan, button_text: "Edit"});
-      })
-    })
+  Loan.getCheckedOutLoan(req.params.id).then(function(loan){
+    if(loan){
+      let { Book, Patron } = loan.dataValues;
+      res.render(
+        "loans/return",
+        {
+          redirect_route:`/loans/${req.params.id}`,
+          loan: loan, book: Book.dataValues,
+          patron: Patron.dataValues,
+          button_text: "Return book"
+        }
+      );
+    }else{
+      res.send(404);
+    }
+  }).catch(function(err){
+    res.send(500);
   });
 });
 
 /* PUT update article. */
 router.put("/:id", function(req, res, next){
   Loan.findById(req.params.id).then(function(loan){
-    return loan.update(req.body);
+    if(loan){
+      return loan.update(req.body);
+    }else{
+      res.send(404);
+    }
   }).then(function(loan){
       res.redirect("/loans");
+  }).catch(function(err){
+    res.send(500);
   });
 });
-
-/* DELETE individual article. */
-router.delete("/:id", function(req, res, next){
-
-  Article.findById(req.params.id).then(function(article){
-    return article.destroy();
-  }).then(function(){
-      res.redirect("/articles");
-  });
-});
-
 
 module.exports = router;

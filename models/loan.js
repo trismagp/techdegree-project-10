@@ -28,12 +28,16 @@ module.exports = (sequelize, DataTypes) => {
       }
     }
 
-    return Loan.findAll({
-      include: [{all:true}],
-      where: [whereObj]
-    })
+    return Loan.findAll({ include: [{all:true}], where: [whereObj] });
   }
 
+  Loan.getCheckedOutLoan = function(loanId){
+    return Loan.find({ where:  {[sequelize.Op.and]: [{id: loanId}, {returned_on : null}]} , include: [{all:true}]});
+  }
+
+  Loan.getPatronLoans = function(patronId){
+    return Loan.findAll({ include: [{all:true}], where: {patron_id:patronId}});
+  }
 
   return Loan;
 };

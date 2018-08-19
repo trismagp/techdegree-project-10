@@ -17,10 +17,14 @@ router.get('/', function(req, res, next) {
     Loan.getLoans(req.query.filter).then(function(filteredLoans){
       let books = filteredLoans.map(loan => loan.dataValues.Book.dataValues);
       res.render("books/index", {books: books, title: req.query.filter === "checkedout" ? "Checked Out Books" : "Overdue Books"});
+    }).catch(function(err){
+      res.send(500);
     });
   }else{
     Book.findAll().then(function(books){
       res.render("books/index", {books: books, title: "Books"});
+    }).catch(function(err){
+      res.send(500);
     });
   }
 });
@@ -29,6 +33,8 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
   Book.create(req.body).then(function(book){
     res.redirect(`/books/${book.id}`);
+  }).catch(function(err){
+    res.send(500);
   });
 });
 
@@ -40,44 +46,64 @@ router.get('/new', function(req, res, next) {
 /* Edit article form. */
 router.get("/:id/edit", function(req, res, next){
   Book.findById(req.params.id).then(function(book){
-    Loan.findAll({ include: [{model:Patron}], where: {book_id:req.params.id}}).then(function(loans){
-      res.render("books/edit", {book: book, loans: loans, button_text: "Save"});
-    })
+    if(book){
+      Loan.findAll({ include: [{model:Patron}], where: {book_id:req.params.id}}).then(function(loans){
+        res.render("books/edit", {book: book, loans: loans, button_text: "Save"});
+      }).catch(function(err){
+        res.send(500);
+      });
+    }else{
+      res.send(404);
+    }
+  }).catch(function(err){
+    res.send(500);
   });
-});
-
-
-/* Delete article form. */
-router.get("/:id/delete", function(req, res, next){
-  Article.findById(req.params.id).then(function(article){
-    res.render("articles/delete", {article: article, title: "Delete Article"});
-  })
 });
 
 
 /* GET individual article. */
 router.get("/:id", function(req, res, next){
   Book.findById(req.params.id).then(function(book){
-    Loan.findAll({ include: [{model:Patron}], where: {book_id:req.params.id}}).then(function(loans){
-      res.render("books/show", {book: book, loans: loans, button_text: "Edit", title: book.title});
-    })
+    if(book){
+      Loan.findAll({ include: [{model:Patron}], where: {book_id:req.params.id}}).then(function(loans){
+        res.render("books/show", {book: book, loans: loans, button_text: "Edit", title: book.title});
+      }).catch(function(err){
+        res.send(500);
+      });
+    }else{
+      res.send(404);
+    }
+  }).catch(function(err){
+    res.send(500);
   });
 });
 
 /* PUT update article. */
 router.put("/:id", function(req, res, next){
   Book.findById(req.params.id).then(function(book){
-    return book.update(req.body);
+    if(book){
+      return book.update(req.body);
+    }else{
+      res.send(404);
+    }
   }).then(function(book){
       res.redirect("/books/" + book.id);
+  }).catch(function(err){
+    res.send(500);
   });
 });
 
 router.put("/:bookId/loans/:loanId/return", function(req, res, next){
   Loan.findById(req.params.loanId).then(function(loan){
-    return loan.update(req.body);
+    if(loan){
+      return loan.update(req.body);  
+    }else{
+      res.send(404);
+    }
   }).then(function(book){
     res.redirect("/books/" + req.params.bookId);
+  }).catch(function(err){
+    res.send(500);
   });
 });
 
@@ -96,18 +122,29 @@ router.get("/:bookId/loans/:loadId/return", function(req, res, next){
         title: "Return book"
       }
     );
+  }).catch(function(err){
+    res.send(500);
   });
 });
 
 
 /* DELETE individual article. */
-router.delete("/:id", function(req, res, next){
-  Article.findById(req.params.id).then(function(article){
-    return article.destroy();
-  }).then(function(){
-      res.redirect("/articles");
-  });
-});
+// router.delete("/:id", function(req, res, next){
+//   Article.findById(req.params.id).then(function(article){
+//     return article.destroy();
+//   }).then(function(){
+//       res.redirect("/articles");
+//   });
+// });
+
+/* Delete article form. */
+// router.get("/:id/delete", function(req, res, next){
+//   Article.findById(req.params.id).then(function(article){
+//     res.render("articles/delete", {article: article, title: "Delete Article"});
+//   }).catch(function(err){
+//     res.send(500);
+//   });
+// });
 
 
 module.exports = router;
