@@ -21,7 +21,11 @@ router.post('/', function(req, res, next) {
   Patron.create(req.body).then(function(patron){
     res.redirect(`/patrons/${patron.id}`);
   }).catch(function(err){
-    res.send(500);
+    if(err.name === "SequelizeValidationError"){
+        res.render("patrons/new", {patron: Patron.build(req.body), button_text: "Create New Patron", title: "New Patron" , errors: err.errors});
+    }else{
+      throw err;
+    }
   });
 });
 
@@ -76,7 +80,18 @@ router.put("/:patronId", function(req, res, next){
   }).then(function(patron){
       res.redirect("/patrons/" + patron.id);
   }).catch(function(err){
-    res.send(500);
+    if(err.name === "SequelizeValidationError"){
+        var patron = Patron.build(req.body);
+        patron.id = req.params.patronId;
+        console.log(patron);
+        Loan.getPatronLoans(req.params.patronId).then(function(loans){
+          res.render("patrons/edit", {patron: patron, loans: loans, button_text: "Save", title: `${patron.first_name} ${patron.last_name}`, errors: err.errors});
+        }).catch(function(err){
+          res.send(500);
+        });
+    }else{
+      throw err;
+    }
   });
 });
 

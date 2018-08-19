@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
           msg: "First Published must be a number"
         }
       }
-    },
+    }
   }, {
       timestamps: false
   });

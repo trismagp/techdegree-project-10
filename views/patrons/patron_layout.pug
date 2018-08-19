@@ -2,6 +2,9 @@ extends ../layout
 
 block content
   h1 Patron: #{patron.first_name} #{patron.last_name}
+  
+  include errors
+  
   block content_patron
   
   h2 Loan History
