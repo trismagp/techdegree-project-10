@@ -1,13 +1,75 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var Loan = sequelize.define('Loan', {
-    book_id: DataTypes.INTEGER,
-    patron_id: DataTypes.INTEGER,
-    loaned_on: DataTypes.DATEONLY,
-    return_by: DataTypes.DATEONLY,
-    returned_on: DataTypes.DATEONLY
-  }, {
-    timestamps: false
+    book_id: {
+      type: DataTypes.INTEGER,
+      validate: {
+        notEmpty: {
+          msg: "book_id is required"
+        },
+        isInt: {
+          msg: "book_id must be a number"
+        }
+      }
+    },
+    patron_id: {
+      type: DataTypes.INTEGER,
+      validate: {
+        notEmpty: {
+          msg: "patron_id is required"
+        },
+        isInt: {
+          msg: "patron_id must be a number"
+        }
+      }
+    },
+    loaned_on: {
+      type: DataTypes.DATEONLY,
+      validate: {
+        notEmpty: {
+          msg: "Loaned On is required"
+        },
+        isDate: {
+          msg: "Loaned On must be a date"
+        }
+      }
+    },
+    return_by: {
+      type: DataTypes.DATEONLY,
+      validate: {
+        notEmpty: {
+          msg: "Loaned On is required"
+        },
+        isDate: {
+          msg: "Loaned On must be a date"
+        }
+      }
+    },
+    returned_on: {
+      type: DataTypes.DATEONLY,
+      validate: {
+        isDate: {
+          msg: "Returned On must be a date"
+        }
+      }
+    }
+  },
+  {
+    timestamps: false,
+    validate:{
+      validateReturnBy: function() {
+        if (this.loaned_on > this.return_by) {
+          throw new Error('Return by date must be after Loaned On')
+        }
+      },
+      validateReturnedOn: function() {
+        if (this.returned_on) {
+          if (this.loaned_on > this.returned_on) {
+            throw new Error('Returned On date must be after Loaned On')
+          }
+        }
+      }
+    }
   });
   Loan.associate = function(models) {
     Loan.belongsTo(models.Book, {foreignKey: 'book_id'});

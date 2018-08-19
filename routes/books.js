@@ -106,6 +106,8 @@ router.put("/:id", function(req, res, next){
     }else{
       throw err;
     }
+  }).catch(function(err){
+    res.send(500);
   });
 });
 

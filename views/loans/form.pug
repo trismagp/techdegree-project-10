@@ -10,9 +10,9 @@ p
       option(value=`${patron.id}`) #{patron.first_name} #{patron.last_name}
 p
   label(for="loaned_on") Loan on: 
-  input(name="loaned_on", id="loaned_on", type="text", value=loaned_on)
+  input(name="loaned_on", id="loaned_on", type="text", value=loan.loaned_on)
 p
   label(for="return_by") Return by:
-  input(name="return_by", id="return_by", type="text", value=return_by)
+  input(name="return_by", id="return_by", type="text", value=loan.return_by)
 p
   input(type="submit" value=button_text)
