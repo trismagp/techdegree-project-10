@@ -121,28 +121,46 @@ router.put("/:bookId/loans/:loanId/return", function(req, res, next){
   }).then(function(book){
     res.redirect("/books/" + req.params.bookId);
   }).catch(function(err){
+    if(err.name === "SequelizeValidationError"){
+      console.log(err.errors);
+        renderReturnBookLoanForm(req, res, next, err.errors);
+    }else{
+      throw err;
+    }
+  }).catch(function(err){
     res.send(500);
   });
 });
 
-router.get("/:bookId/loans/:loadId/return", function(req, res, next){
+function renderReturnBookLoanForm(req, res, next, errors){
   Loan.getLoans("checkedout").then(function(checkedoutLoans){
     let loan = checkedoutLoans.filter(loan => loan.dataValues.Book.dataValues.id === parseInt(req.params.bookId))[0];
-    let { Book, Patron} = loan.dataValues;
-    res.render(
-      "loans/return",
-      {
-        redirect_route:`/books/${req.params.bookId}/loans/${req.params.loadId}/return`,
-        loan: loan,
-        book: Book,
-        patron: Patron,
-        button_text: "Return book",
-        title: "Return book"
-      }
-    );
+    if (loan) {
+      let now = new Date();
+      loan.returned_on = dateFormat(now, "yyyy-mm-dd");
+      let { Book, Patron} = loan.dataValues;
+      res.render(
+        "loans/return",
+        {
+          redirect_route:`/books/${req.params.bookId}/loans/${req.params.loanId}/return`,
+          loan: loan,
+          book: Book,
+          patron: Patron,
+          button_text: "Return book",
+          title: "Return book",
+          errors:errors
+        }
+      );
+    }else{
+      res.send(404);
+    }
   }).catch(function(err){
     res.send(500);
   });
+}
+
+router.get("/:bookId/loans/:loanId/return", function(req, res, next){
+  renderReturnBookLoanForm(req, res, next, null);
 });
 
 

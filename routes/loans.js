@@ -5,10 +5,6 @@ var Book = require("../models").Book;
 var Patron = require("../models").Patron;
 var dateFormat = require('dateformat');
 
-// TODO: edit, delete loan
-// TODO: filter checked out books in loan form
-// TODO: title
-// TODO: check form error
 
 /* GET loans listing. */
 router.get('/', function(req, res, next) {
