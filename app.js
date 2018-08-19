@@ -8,7 +8,6 @@ var connect = require('connect')
 var methodOverride = require('method-override')
 
 var routes = require('./routes/index');
-var articles = require('./routes/articles');
 var books = require('./routes/books');
 var patrons = require('./routes/patrons');
 var loans = require('./routes/loans');
