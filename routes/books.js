@@ -34,6 +34,12 @@ router.post('/', function(req, res, next) {
   Book.create(req.body).then(function(book){
     res.redirect(`/books/${book.id}`);
   }).catch(function(err){
+    if(err.name === "SequelizeValidationError"){
+        res.render("books/new", {book: Book.build(req.body), button_text: "Create New Book", title: "New Book", errors: err.errors});
+    }else{
+      throw err;
+    }
+  }).catch(function(err){
     res.send(500);
   });
 });
@@ -89,14 +95,24 @@ router.put("/:id", function(req, res, next){
   }).then(function(book){
       res.redirect("/books/" + book.id);
   }).catch(function(err){
-    res.send(500);
+    if(err.name === "SequelizeValidationError"){
+        var book = Book.build(req.body);
+        book.id = req.params.id;
+        Loan.findAll({ include: [{model:Patron}], where: {book_id:req.params.id}}).then(function(loans){
+          res.render("books/edit", {book: book, loans: loans, button_text: "Save", errors: err.errors});
+        }).catch(function(err){
+          res.send(500);
+        });
+    }else{
+      throw err;
+    }
   });
 });
 
 router.put("/:bookId/loans/:loanId/return", function(req, res, next){
   Loan.findById(req.params.loanId).then(function(loan){
     if(loan){
-      return loan.update(req.body);  
+      return loan.update(req.body);
     }else{
       res.send(404);
     }
@@ -126,25 +142,6 @@ router.get("/:bookId/loans/:loadId/return", function(req, res, next){
     res.send(500);
   });
 });
-
-
-/* DELETE individual article. */
-// router.delete("/:id", function(req, res, next){
-//   Article.findById(req.params.id).then(function(article){
-//     return article.destroy();
-//   }).then(function(){
-//       res.redirect("/articles");
-//   });
-// });
-
-/* Delete article form. */
-// router.get("/:id/delete", function(req, res, next){
-//   Article.findById(req.params.id).then(function(article){
-//     res.render("articles/delete", {article: article, title: "Delete Article"});
-//   }).catch(function(err){
-//     res.send(500);
-//   });
-// });
 
 
 module.exports = router;

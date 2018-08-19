@@ -31,10 +31,10 @@ router.get('/new', function(req, res, next) {
 });
 
 /* Edit article form. */
-router.get("/:id/edit", function(req, res, next){
-  Patron.findById(req.params.id).then(function(patron){
+router.get("/:patronId/edit", function(req, res, next){
+  Patron.findById(req.params.patronId).then(function(patron){
     if(patron){
-      Loan.getPatronLoans(req.params.id).then(function(loans){
+      Loan.getPatronLoans(req.params.patronId).then(function(loans){
         res.render("patrons/edit", {patron: patron, loans: loans, button_text: "Save", title: `${patron.first_name} ${patron.last_name}`});
       }).catch(function(err){
         res.send(500);
@@ -49,10 +49,10 @@ router.get("/:id/edit", function(req, res, next){
 
 
 /* GET individual article. */
-router.get("/:id", function(req, res, next){
-  Patron.findById(req.params.id).then(function(patron){
+router.get("/:patronId", function(req, res, next){
+  Patron.findById(req.params.patronId).then(function(patron){
     if(patron){
-      Loan.getPatronLoans(req.params.id).then(function(loans){
+      Loan.getPatronLoans(req.params.patronId).then(function(loans){
         res.render("patrons/show", {patron: patron, loans: loans, button_text: "Edit", title: `${patron.first_name} ${patron.last_name}`});
       }).catch(function(err){
         res.send(500);
@@ -66,8 +66,8 @@ router.get("/:id", function(req, res, next){
 });
 
 /* PUT update article. */
-router.put("/:id", function(req, res, next){
-  Patron.findById(req.params.id).then(function(patron){
+router.put("/:patronId", function(req, res, next){
+  Patron.findById(req.params.patronId).then(function(patron){
     if(patron){
       return patron.update(req.body);
     }else{
