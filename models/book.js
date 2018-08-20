@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
       timestamps: false,
       validate:{
-        validateFirstPhublished: function() {      // first_published is optional and an int
+        validateFirstPhublished: function() {      // first_published is optional and an integer
           if(this.first_published){
             if (!Number.isInteger(parseInt(this.first_published))) {
               throw new Error('first published should be an integer')

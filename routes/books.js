@@ -32,7 +32,7 @@ router.get('/', function(req, res, next) {
 /* POST create book. */
 router.post('/', function(req, res, next) {
   Book.create(req.body).then(function(book){
-    res.redirect(`/books/${book.id}`);
+    res.redirect("/books");
   }).catch(function(err){
     if(err.name === "SequelizeValidationError"){
         res.render("books/new", {book: Book.build(req.body), button_text: "Create New Book", title: "New Book", errors: err.errors});
@@ -93,7 +93,7 @@ router.put("/:id", function(req, res, next){
       res.send(404);
     }
   }).then(function(book){
-      res.redirect("/books/" + book.id);
+      res.redirect("/books");
   }).catch(function(err){
     if(err.name === "SequelizeValidationError"){
         var book = Book.build(req.body);

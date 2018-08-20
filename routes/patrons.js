@@ -19,7 +19,7 @@ router.get('/', function(req, res, next) {
 /* POST create article. */
 router.post('/', function(req, res, next) {
   Patron.create(req.body).then(function(patron){
-    res.redirect(`/patrons/${patron.id}`);
+    res.redirect("/patrons");
   }).catch(function(err){
     if(err.name === "SequelizeValidationError"){
         res.render("patrons/new", {patron: Patron.build(req.body), button_text: "Create New Patron", title: "New Patron" , errors: err.errors});
@@ -78,7 +78,7 @@ router.put("/:patronId", function(req, res, next){
       res.send(404);
     }
   }).then(function(patron){
-      res.redirect("/patrons/" + patron.id);
+      res.redirect("/patrons");
   }).catch(function(err){
     if(err.name === "SequelizeValidationError"){
         var patron = Patron.build(req.body);
@@ -103,7 +103,7 @@ router.put("/:patronId/loans/:loanId/return", function(req, res, next){
     }else{
       res.send(404);
     }
-  }).then(function(book){
+  }).then(function(loan){
     res.redirect("/patrons/" + req.params.patronId);
   }).catch(function(err){
     if(err.name === "SequelizeValidationError"){

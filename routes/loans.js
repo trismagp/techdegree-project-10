@@ -43,29 +43,19 @@ router.post('/', function(req, res, next) {
 });
 
 function renderNewLoanForm(req, res, next, loan, errors){
-  Loan.getLoans("checkedout").then(function(checkedoutLoans){
-    let checkedoutBookIds = [];
-    checkedoutLoans.map(loan => checkedoutBookIds.push(loan.dataValues.Book.dataValues.id));
-    Book.findAll().then(function(books){
-      let availableBooks = books;
-      if (checkedoutBookIds.length > 0) {
-        availableBooks = books.filter(book => !checkedoutBookIds.includes(book.id));
-      }
-      Patron.findAll().then(function(patrons){
-        res.render(
-          "loans/new",
-          {
-            loan: loan,
-            books: availableBooks,
-            patrons:patrons,
-            button_text: "Create New Loan",
-            title: "New Loan",
-            errors: errors
-          }
-        );
-      }).catch(function(err){
-        res.send(500);
-      })
+  Book.findAll().then(function(books){
+    Patron.findAll().then(function(patrons){
+      res.render(
+        "loans/new",
+        {
+          loan: loan,
+          books: books,
+          patrons:patrons,
+          button_text: "Create New Loan",
+          title: "New Loan",
+          errors: errors
+        }
+      );
     }).catch(function(err){
       res.send(500);
     })
