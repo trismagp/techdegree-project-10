@@ -28,19 +28,18 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    first_published: {
-      type: DataTypes.INTEGER,
-      validate: {
-        notEmpty: {
-          msg: "First Published is required"
-        },
-        isInt: {
-          msg: "First Published must be a number"
+    first_published: DataTypes.INTEGER
+  }, {
+      timestamps: false,
+      validate:{
+        validateFirstPhublished: function() {      // first_published is optional and an int
+          if(this.first_published){
+            if (!Number.isInteger(parseInt(this.first_published))) {
+              throw new Error('first published should be an integer')
+            }
+          }
         }
       }
-    }
-  }, {
-      timestamps: false
   });
   Book.associate = function(models) {
     // associations can be defined here
