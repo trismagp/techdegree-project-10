@@ -111,55 +111,58 @@ router.put("/:id", function(req, res, next){
   });
 });
 
-router.put("/:bookId/loans/:loanId/return", function(req, res, next){
-  Loan.findById(req.params.loanId).then(function(loan){
-    if(loan){
-      return loan.update(req.body);
-    }else{
-      res.send(404);
-    }
-  }).then(function(book){
-    res.redirect("/books/" + req.params.bookId);
-  }).catch(function(err){
-    if(err.name === "SequelizeValidationError"){
-      renderReturnBookLoanForm(req, res, next, err.errors);
-    }else{
-      throw err;
-    }
-  }).catch(function(err){
-    res.send(500);
-  });
-});
+// *********************************************************************************
+// route to return books form a book's page and redirecting to the book's page
+// *********************************************************************************
 
-function renderReturnBookLoanForm(req, res, next, errors){
-  Loan.getCheckedOutLoan(req.params.loanId).then(function(loan){
-    if (loan) {
-      let now = new Date();
-      loan.returned_on = dateFormat(now, "yyyy-mm-dd");
-      let { Book, Patron} = loan.dataValues;
-      res.render(
-        "loans/return",
-        {
-          redirect_route:`/books/${req.params.bookId}/loans/${req.params.loanId}/return`,
-          loan: loan,
-          book: Book,
-          patron: Patron,
-          button_text: "Return book",
-          title: "Return book",
-          errors:errors
-        }
-      );
-    }else{
-      res.send(404);
-    }
-  }).catch(function(err){
-    res.send(500);
-  });
-}
-
-router.get("/:bookId/loans/:loanId/return", function(req, res, next){
-  renderReturnBookLoanForm(req, res, next, null);
-});
-
+// router.get("/:bookId/loans/:loanId/return", function(req, res, next){
+//   renderReturnBookLoanForm(req, res, next, null);
+// });
+//
+// router.put("/:bookId/loans/:loanId/return", function(req, res, next){
+//   Loan.findById(req.params.loanId).then(function(loan){
+//     if(loan){
+//       return loan.update(req.body);
+//     }else{
+//       res.send(404);
+//     }
+//   }).then(function(book){
+//     res.redirect("/books/" + req.params.bookId);
+//   }).catch(function(err){
+//     if(err.name === "SequelizeValidationError"){
+//       renderReturnBookLoanForm(req, res, next, err.errors);
+//     }else{
+//       throw err;
+//     }
+//   }).catch(function(err){
+//     res.send(500);
+//   });
+// });
+//
+// function renderReturnBookLoanForm(req, res, next, errors){
+//   Loan.getCheckedOutLoan(req.params.loanId).then(function(loan){
+//     if (loan) {
+//       let now = new Date();
+//       loan.returned_on = dateFormat(now, "yyyy-mm-dd");
+//       let { Book, Patron} = loan.dataValues;
+//       res.render(
+//         "loans/return",
+//         {
+//           redirect_route:`/books/${req.params.bookId}/loans/${req.params.loanId}/return`,
+//           loan: loan,
+//           book: Book,
+//           patron: Patron,
+//           button_text: "Return book",
+//           title: "Return book",
+//           errors:errors
+//         }
+//       );
+//     }else{
+//       res.send(404);
+//     }
+//   }).catch(function(err){
+//     res.send(500);
+//   });
+// }
 
 module.exports = router;

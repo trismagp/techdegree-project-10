@@ -30,4 +30,6 @@ block content
               td= loan.returned_on 
               td
                 if !loan.returned_on 
-                  a(href=`/books/${book.id}/loans/${loan.id}/return` class="button") Return Book
+                  a(href=`/loans/${loan.id}/return` class="button") Return Book
+                  //- link for returning a book from the book page and redirecting to the book page
+                  //- a(href=`/books/${book.id}/loans/${loan.id}/return` class="button") Return Book
