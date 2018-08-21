@@ -5,11 +5,11 @@ block content
   p
     a(href="/books/new", class="button") Create New Book
   p Filters 
-    a(href="/books") All 
+    a(href="/books?page=1") All 
     | | 
-    a(href="/books?filter=overdue") Overdue 
+    a(href="/books?page=1&filter=overdue") Overdue 
     | | 
-    a(href="/books?filter=checkedout") Checked Out 
+    a(href="/books?page=1&filter=checkedout") Checked Out 
     
   table
     thead
@@ -18,7 +18,15 @@ block content
         th Author
         th Genre
         th Year Released
-          
+      tr
+        th
+          input(id="title", type="text", class="search_input_books", value=search_title)
+        th
+          input(id="author", type="text", class="search_input_books" , value=search_author)
+        th
+          input(id="genre", type="text", class="search_input_books" , value=search_genre)
+        th
+          input(id="year", type="text", class="search_input_books" , value=search_year)
     tbody
       each book in books
         tr
@@ -28,3 +36,11 @@ block content
           td= book.genre
           td= book.first_published
   
+  ul(class="pagination")
+    each num in nb_pages
+      li 
+        a= num + 1
+  
+  
+  script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
+  script(src='js/script.js')

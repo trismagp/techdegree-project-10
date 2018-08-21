@@ -8,24 +8,93 @@ var dateFormat = require('dateformat');
 // TODO: return book
 // TODO: link patron
 
+function replaceAll(text,oldText,newText){
+  if(text){
+    return text.split(oldText).join(newText);
+  }
+  return "";
+}
+
 /* GET books listing. */
 router.get('/', function(req, res, next) {
+  // Project.findAndCountAll({
+  //    where: {
+  //       title: {
+  //         [Op.like]: 'foo%'
+  //       }
+  //    },
+  //    offset: 10,
+  //    limit: 2
+  // })
+  // .then(result => {
+  //   console.log(result.count);
+  //   console.log(result.rows);
+  // });
+
   if(req.query.filter){
     // filtering checked out or overdue books for the following routes:
     // 1. /books?filter=checkedout
-    // 2. /books?filter=ouverdue
+    // 2. /books?filter=overdue
     Loan.getLoans(req.query.filter).then(function(filteredLoans){
       let books = filteredLoans.map(loan => loan.dataValues.Book.dataValues);
-      res.render("books/index", {books: books, title: req.query.filter === "checkedout" ? "Checked Out Books" : "Overdue Books"});
+
+      res.render(
+        "books/index",
+        {
+          books: books,
+          search_title: replaceAll(req.query.title,"%"," "),
+          search_author: replaceAll(req.query.author,"%"," "),
+          search_genre: replaceAll(req.query.genre,"%"," "),
+          search_year: replaceAll(req.query.year,"%"," "),
+          title: req.query.filter === "checkedout" ? "Checked Out Books" : "Overdue Books"
+        }
+      );
     }).catch(function(err){
       res.send(500);
     });
   }else{
-    Book.findAll().then(function(books){
-      res.render("books/index", {books: books, title: "Books"});
+    Book.findAndCountAllFilter(
+      replaceAll(req.query.title,"%"," "),
+      replaceAll(req.query.author,"%"," "),
+      replaceAll(req.query.genre,"%"," "),
+      req.query.year ,
+      parseInt(req.query.page)-1,
+      10
+    ).then(books => {
+      // console.log(result.count);
+      // console.log(result.rows);
+      // console.log(books);
+      res.render(
+        "books/index",
+        {
+          books: books.rows,
+          search_title: replaceAll(req.query.title,"%"," "),
+          search_author: replaceAll(req.query.author,"%"," "),
+          search_genre: replaceAll(req.query.genre,"%"," "),
+          search_year: replaceAll(req.query.year,"%"," "),
+          title: "Books",
+          nb_pages: [...Array(Math.ceil(books.count / 10)).keys()]
+        }
+      );
     }).catch(function(err){
       res.send(500);
     });
+
+    // Book.findAll().then(function(books){
+    //   res.render(
+    //     "books/index",
+    //     {
+    //       books: books,
+    //       search_title: replaceAll(req.query.title,"%"," "),
+    //       search_author: replaceAll(req.query.author,"%"," "),
+    //       search_genre: replaceAll(req.query.genre,"%"," "),
+    //       search_year: replaceAll(req.query.year,"%"," "),
+    //       title: "Books"
+    //     }
+    //   );
+    // }).catch(function(err){
+    //   res.send(500);
+    // });
   }
 });
 

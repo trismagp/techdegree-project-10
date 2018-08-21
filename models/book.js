@@ -46,6 +46,41 @@ module.exports = (sequelize, DataTypes) => {
   };
 
 
-
+  Book.findAndCountAllFilter = function(title, author, genre, year, offset, limit){
+    let yearStart = -10000;
+    let yearEnd = 10000;
+    if(year !== undefined){
+      yearStart = year;
+      yearEnd = year;
+    }
+    return Book.findAndCountAll({
+     where: {
+       [sequelize.Op.and]: [
+        {
+          title: {
+            [sequelize.Op.like]:`%${title}%`
+          }
+        },
+        {
+          author: {
+            [sequelize.Op.like]:`%${author}%`
+          }
+        },
+        {
+          genre: {
+            [sequelize.Op.like]:`%${genre}%`
+          }
+        },
+        {
+          first_published: {
+            [sequelize.Op.between]:[yearStart,yearEnd]
+          }
+        }
+      ]
+     }
+    }).then(books =>{
+      return {count:books.count, rows: books.rows.slice(limit * offset, limit * offset + limit )};
+    });
+  };
   return Book;
 };
