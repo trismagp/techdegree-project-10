@@ -20,13 +20,13 @@ block content
         th Year Released
       tr
         th
-          input(id="title", type="text", class="search_input_books", value=search_title)
+          input(id="title", type="text", class="search_input_books", value=search_title, placeholder="Search for titles")
         th
-          input(id="author", type="text", class="search_input_books" , value=search_author)
+          input(id="author", type="text", class="search_input_books" , value=search_author, placeholder="Search for authors")
         th
-          input(id="genre", type="text", class="search_input_books" , value=search_genre)
+          input(id="genre", type="text", class="search_input_books" , value=search_genre, placeholder="Search for genres")
         th
-          input(id="year", type="text", class="search_input_books" , value=search_year)
+          input(id="year", type="text", class="search_input_books" , value=search_year, placeholder="Exact year please...")
     tbody
       each book in books
         tr
