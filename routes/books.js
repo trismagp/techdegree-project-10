@@ -17,75 +17,54 @@ function replaceAll(text,oldText,newText){
 /* GET books listing. */
 router.get('/', function(req, res, next) {
 
-  if(req.query.filter){
-    // filtering checked out or overdue books for the following routes:
-    // 1. /books?filter=checkedout
-    // 2. /books?filter=overdue
-    Loan.getLoans(req.query.filter).then(function(filteredLoans){
-      let books = filteredLoans.map(loan => loan.dataValues.Book.dataValues);
-
-      res.render(
-        "books/index",
-        {
-          books: books,
-          search_title: replaceAll(req.query.title,"%"," "),
-          search_author: replaceAll(req.query.author,"%"," "),
-          search_genre: replaceAll(req.query.genre,"%"," "),
-          search_year: replaceAll(req.query.year,"%"," "),
-          title: req.query.filter === "checkedout" ? "Checked Out Books" : "Overdue Books"
-        }
-      );
-    }).catch(function(err){
-      res.send(500);
-    });
-  }else{
-    Book.findAndCountAllFilter(
-      replaceAll(req.query.title,"%"," "),
-      replaceAll(req.query.author,"%"," "),
-      replaceAll(req.query.genre,"%"," "),
-      req.query.year ,
-      parseInt(req.query.page)-1,
-      nbLinesPerPage
-    ).then(books => {
-      res.render(
-        "books/index",
-        {
-          books: books.rows,
-          search_title: replaceAll(req.query.title,"%"," "),
-          search_author: replaceAll(req.query.author,"%"," "),
-          search_genre: replaceAll(req.query.genre,"%"," "),
-          search_year: replaceAll(req.query.year,"%"," "),
-          title: "Books",
-          page_num: req.query.page,
-          nb_pages: [...Array(Math.ceil(books.count / nbLinesPerPage)).keys()]
-        }
-      );
-    }).catch(function(err){
-      res.send(500);
-    });
-
-    // Book.findAll().then(function(books){
-    //   res.render(
-    //     "books/index",
-    //     {
-    //       books: books,
-    //       search_title: replaceAll(req.query.title,"%"," "),
-    //       search_author: replaceAll(req.query.author,"%"," "),
-    //       search_genre: replaceAll(req.query.genre,"%"," "),
-    //       search_year: replaceAll(req.query.year,"%"," "),
-    //       title: "Books"
-    //     }
-    //   );
-    // }).catch(function(err){
-    //   res.send(500);
-    // });
+  let queryPage = 1;
+  if(req.query.page!==undefined){
+    queryPage = req.query.page;
   }
+
+    Loan.getLoans(req.query.filter).then(function(filteredLoans){
+
+      let bookIds = [];
+      if (["checkedout","overdue"].indexOf(req.query.filter)>-1) {
+        bookIds = filteredLoans.map(loan => loan.dataValues.Book.dataValues.id);
+      }
+
+      Book.findAndCountAllFilter(
+        bookIds,
+        replaceAll(req.query.title,"%"," "),
+        replaceAll(req.query.author,"%"," "),
+        replaceAll(req.query.genre,"%"," "),
+        req.query.year ,
+        parseInt(queryPage)-1,
+        nbLinesPerPage
+      ).then(books => {
+        res.render(
+          "books/index",
+          {
+            books: books.rows,
+            search_title: replaceAll(req.query.title,"%"," "),
+            search_author: replaceAll(req.query.author,"%"," "),
+            search_genre: replaceAll(req.query.genre,"%"," "),
+            search_year: replaceAll(req.query.year,"%"," "),
+            title: "Books",
+            page_num: queryPage,
+            nb_pages: [...Array(Math.ceil(books.count / nbLinesPerPage)).keys()]
+          }
+        );
+      }).catch(function(err){
+        res.send(500);
+      });
+
+    }).catch(function(err){
+      res.send(500);
+    });
+
 });
 
 /* POST create book. */
 router.post('/', function(req, res, next) {
   Book.create(req.body).then(function(book){
-    res.redirect("/books");
+    res.redirect("/books?page=1");
   }).catch(function(err){
     if(err.name === "SequelizeValidationError"){
         res.render("books/new", {book: Book.build(req.body), button_text: "Create New Book", title: "New Book", errors: err.errors});
@@ -146,7 +125,7 @@ router.put("/:id", function(req, res, next){
       res.send(404);
     }
   }).then(function(book){
-      res.redirect("/books");
+      res.redirect("/books?page=1");
   }).catch(function(err){
     if(err.name === "SequelizeValidationError"){
         var book = Book.build(req.body);

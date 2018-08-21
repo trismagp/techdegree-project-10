@@ -16,17 +16,22 @@ function replaceAll(text,oldText,newText){
 
 /* GET articles listing. */
 router.get('/', function(req, res, next) {
-  console.log(req.query);
+
+  let queryPage = 1;
+  if(req.query.page!==undefined){
+    queryPage = req.query.page;
+  }
+
   Patron.findAndCountAllFilter(
     replaceAll(req.query.name,"%"," "),       //fullName,
     replaceAll(req.query.address,"%"," "),    //address,
     replaceAll(req.query.email,"%"," "),      //email,
     replaceAll(req.query.library_id,"%"," "), //libraryId,
     req.query.zip,                            //zip,
-    parseInt(req.query.page)-1,
+    parseInt(queryPage)-1,
     nbLinesPerPage
   ).then(patrons => {
-    console.log(patrons);
+
     res.render(
       "patrons/index",
       {
@@ -37,7 +42,7 @@ router.get('/', function(req, res, next) {
         patron_library_id: replaceAll(req.query.library_id,"%"," "),
         patron_zip: replaceAll(req.query.zip,"%"," "),
         title: "Patrons",
-        page_num: req.query.page,
+        page_num: queryPage,
         nb_pages: [...Array(Math.ceil(patrons.count / nbLinesPerPage)).keys()]
       }
     );
@@ -56,7 +61,7 @@ router.get('/', function(req, res, next) {
 /* POST create article. */
 router.post('/', function(req, res, next) {
   Patron.create(req.body).then(function(patron){
-    res.redirect("/patrons");
+    res.redirect("/patrons?page=1");
   }).catch(function(err){
     if(err.name === "SequelizeValidationError"){
         res.render("patrons/new", {patron: Patron.build(req.body), button_text: "Create New Patron", title: "New Patron" , errors: err.errors});
@@ -120,7 +125,6 @@ router.put("/:patronId", function(req, res, next){
     if(err.name === "SequelizeValidationError"){
         var patron = Patron.build(req.body);
         patron.id = req.params.patronId;
-        console.log(patron);
         Loan.getPatronLoans(req.params.patronId).then(function(loans){
           res.render("patrons/edit", {patron: patron, loans: loans, button_text: "Save", title: `${patron.first_name} ${patron.last_name}`, errors: err.errors});
         }).catch(function(err){

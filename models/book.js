@@ -46,40 +46,61 @@ module.exports = (sequelize, DataTypes) => {
   };
 
 
-  Book.findAndCountAllFilter = function(title, author, genre, year, offset, limit){
+  Book.findAndCountAllFilter = function(bookIdsParam, title, author, genre, year, offset, limit){
     let yearStart = -10000;
     let yearEnd = 10000;
     if(year !== undefined){
       yearStart = year;
       yearEnd = year;
     }
-    return Book.findAndCountAll({
-     where: {
-       [sequelize.Op.and]: [
-        {
-          title: {
-            [sequelize.Op.like]:`%${title}%`
+
+
+    return Book.max('id').then(books =>{
+      let bookIds = bookIdsParam;
+      if(bookIdsParam.length === 0 ){
+        bookIds = [...Array(books+1).keys()];
+      }
+
+      return Book.findAndCountAll({
+       where: {
+         [sequelize.Op.and]: [
+           {
+             id: {
+               [sequelize.Op.in]: bookIds
+             }
+           },
+          {
+            title: {
+              [sequelize.Op.like]:`%${title}%`
+            }
+          },
+          {
+            author: {
+              [sequelize.Op.like]:`%${author}%`
+            }
+          },
+          {
+            genre: {
+              [sequelize.Op.like]:`%${genre}%`
+            }
+          },
+          {
+            first_published: {
+              [sequelize.Op.or]: {
+                 [sequelize.Op.between]:[yearStart,yearEnd],
+                 [sequelize.Op.eq]: ""
+               }
+            }
           }
-        },
-        {
-          author: {
-            [sequelize.Op.like]:`%${author}%`
-          }
-        },
-        {
-          genre: {
-            [sequelize.Op.like]:`%${genre}%`
-          }
-        },
-        {
-          first_published: {
-            [sequelize.Op.between]:[yearStart,yearEnd]
-          }
-        }
-      ]
-     }
-    }).then(books =>{
-      return {count:books.count, rows: books.rows.slice(limit * offset, limit * offset + limit )};
+        ]
+       }
+      }).then(books =>{
+        return {count:books.count, rows: books.rows.slice(limit * offset, limit * offset + limit )};
+      }).catch(function(err){
+        res.send(500);
+      });
+    }).catch(function(err){
+      res.send(500);
     });
   };
   return Book;

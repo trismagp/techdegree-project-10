@@ -78,6 +78,7 @@ module.exports = (sequelize, DataTypes) => {
 
 
   Loan.getLoans = function(filter) {
+
     var whereObj = {};
     if(filter === "checkedout"){
       whereObj = {returned_on : null }
