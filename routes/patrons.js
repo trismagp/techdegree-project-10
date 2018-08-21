@@ -4,16 +4,53 @@ var Patron = require("../models").Patron;
 var Book = require("../models").Book;
 var Loan = require("../models").Loan;
 var dateFormat = require('dateformat');
+var nbLinesPerPage = 5;
 
-
+// TODO: DRY
+function replaceAll(text,oldText,newText){
+  if(text){
+    return text.split(oldText).join(newText);
+  }
+  return "";
+}
 
 /* GET articles listing. */
 router.get('/', function(req, res, next) {
-  Patron.findAll().then(function(patrons){
-    res.render("patrons/index", {patrons: patrons, title: "Patrons"});
+  console.log(req.query);
+  Patron.findAndCountAllFilter(
+    replaceAll(req.query.name,"%"," "),       //fullName,
+    replaceAll(req.query.address,"%"," "),    //address,
+    replaceAll(req.query.email,"%"," "),      //email,
+    replaceAll(req.query.library_id,"%"," "), //libraryId,
+    req.query.zip,                            //zip,
+    parseInt(req.query.page)-1,
+    nbLinesPerPage
+  ).then(patrons => {
+    console.log(patrons);
+    res.render(
+      "patrons/index",
+      {
+        patrons: patrons.rows,
+        patron_name: replaceAll(req.query.name,"%"," "),
+        patron_address: replaceAll(req.query.address,"%"," "),
+        patron_email: replaceAll(req.query.email,"%"," "),
+        patron_library_id: replaceAll(req.query.library_id,"%"," "),
+        patron_zip: replaceAll(req.query.zip,"%"," "),
+        title: "Patrons",
+        page_num: req.query.page,
+        nb_pages: [...Array(Math.ceil(patrons.count / nbLinesPerPage)).keys()]
+      }
+    );
   }).catch(function(err){
     res.send(500);
-  });
+  })
+
+  // Patron.findAll().then(function(patrons){
+  //   res.render("patrons/index", {patrons: patrons, title: "Patrons"});
+  // }).catch(function(err){
+  //   res.send(500);
+  // });
+
 });
 
 /* POST create article. */

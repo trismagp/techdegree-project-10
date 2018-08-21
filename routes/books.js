@@ -5,8 +5,7 @@ var Loan = require("../models").Loan;
 var Patron = require("../models").Patron;
 var dateFormat = require('dateformat');
 
-// TODO: return book
-// TODO: link patron
+var nbLinesPerPage = 5;
 
 function replaceAll(text,oldText,newText){
   if(text){
@@ -17,19 +16,6 @@ function replaceAll(text,oldText,newText){
 
 /* GET books listing. */
 router.get('/', function(req, res, next) {
-  // Project.findAndCountAll({
-  //    where: {
-  //       title: {
-  //         [Op.like]: 'foo%'
-  //       }
-  //    },
-  //    offset: 10,
-  //    limit: 2
-  // })
-  // .then(result => {
-  //   console.log(result.count);
-  //   console.log(result.rows);
-  // });
 
   if(req.query.filter){
     // filtering checked out or overdue books for the following routes:
@@ -59,11 +45,8 @@ router.get('/', function(req, res, next) {
       replaceAll(req.query.genre,"%"," "),
       req.query.year ,
       parseInt(req.query.page)-1,
-      10
+      nbLinesPerPage
     ).then(books => {
-      // console.log(result.count);
-      // console.log(result.rows);
-      // console.log(books);
       res.render(
         "books/index",
         {
@@ -73,7 +56,8 @@ router.get('/', function(req, res, next) {
           search_genre: replaceAll(req.query.genre,"%"," "),
           search_year: replaceAll(req.query.year,"%"," "),
           title: "Books",
-          nb_pages: [...Array(Math.ceil(books.count / 10)).keys()]
+          page_num: req.query.page,
+          nb_pages: [...Array(Math.ceil(books.count / nbLinesPerPage)).keys()]
         }
       );
     }).catch(function(err){

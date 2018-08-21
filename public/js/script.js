@@ -14,7 +14,7 @@ function getUrlParameter(sParam) {
     }
 };
 
-function updateUrl(pageNum){
+function updateBooksUrl(pageNum){
   let filter = getUrlParameter("filter");
   let title = $('#title').val().split(" ").join("%");   // replace all the white spaces with %
   let author = $('#author').val().split(" ").join("%");
@@ -31,10 +31,35 @@ function updateUrl(pageNum){
 }
 
 $('.search_input_books').on('change', function(){
-  updateUrl(1);
+  updateBooksUrl(1);
 });
 
-$('ul.pagination a').on('click',function(){
+$('ul.pagination.books a').on('click',function(){
   const pageNumClicked = $(this).html();
-  updateUrl(pageNumClicked);
+  updateBooksUrl(pageNumClicked);
+})
+
+function updatePatronsUrl(pageNum){
+  let patron_name = $('#patron_name').val().split(" ").join("%");   // replace all the white spaces with %
+  let patron_address = $('#patron_address').val().split(" ").join("%");
+  let patron_email = $('#patron_email').val().split(" ").join("%");
+  let patron_library_id = $('#patron_library_id').val().split(" ").join("%");
+  let patron_zip = $('#patron_zip').val().split(" ").join("%");
+
+  let url = `/patrons?page=${pageNum}`;
+  url = url + (patron_name !=="" ? `&name=${patron_name}` : "");
+  url = url + (patron_address !=="" ? `&address=${patron_address}` : "");
+  url = url + (patron_email !=="" ? `&email=${patron_email}` : "");
+  url = url + (patron_library_id !=="" ? `&library_id=${patron_library_id}` : "");
+  url = url + (patron_zip !=="" ? `&zip=${patron_zip}` : "");
+  window.location.href = url;
+}
+
+$('.search_input_patrons').on('change', function(){
+  updatePatronsUrl(1);
+});
+
+$('ul.pagination.patrons a').on('click',function(){
+  const pageNumClicked = $(this).html();
+  updatePatronsUrl(pageNumClicked);
 })

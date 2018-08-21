@@ -13,7 +13,17 @@ block content
         th Email
         th Library ID
         th Zip
-        
+      tr
+        th
+          input(id="patron_name", type="text", class="search_input_patrons", value=patron_name)
+        th
+          input(id="patron_address", type="text", class="search_input_patrons", value=patron_address)
+        th
+          input(id="patron_email", type="text", class="search_input_patrons", value=patron_email)
+        th
+          input(id="patron_library_id", type="text", class="search_input_patrons", value=patron_library_id)
+        th
+          input(id="patron_zip", type="text", class="search_input_patrons", value=patron_zip)
     tbody
       each patron in patrons
         tr
@@ -23,5 +33,12 @@ block content
           td= patron.email
           td= patron.library_id
           td= patron.zip_code
-  
+    if nb_pages.length > 1
+      ul(class="pagination patrons")
+        each num in nb_pages
+          li
+            if page_num == num + 1
+              a(class="active")= num + 1
+            else
+              a= num + 1
           

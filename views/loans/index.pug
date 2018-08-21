@@ -25,11 +25,11 @@ block content
         
     tbody
       each loan in loans
-        tr
+        tr 
           td
-            a(href=`/books/${loan.dataValues.Book.dataValues.id}`)= loan.dataValues.Book.dataValues.title
+            a(href=`/books/${loan.Book.id}`)= loan.Book.title
           td
-            a(href=`/patrons/${loan.dataValues.Patron.dataValues.id}`) #{loan.dataValues.Patron.dataValues.first_name} #{loan.dataValues.Patron.dataValues.last_name} 
+            a(href=`/patrons/${loan.Patron.id}`) #{loan.Patron.first_name} #{loan.Patron.last_name} 
           td= loan.loaned_on
           td= loan.return_by
           td= loan.returned_on

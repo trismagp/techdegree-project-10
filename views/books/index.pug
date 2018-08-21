@@ -35,12 +35,13 @@ block content
           td= book.author 
           td= book.genre
           td= book.first_published
+          
+    if nb_pages.length > 1
+      ul(class="pagination books")
+        each num in nb_pages
+          li
+            if page_num == num + 1
+              a(class="active")= num + 1
+            else
+              a= num + 1
   
-  ul(class="pagination")
-    each num in nb_pages
-      li 
-        a= num + 1
-  
-  
-  script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
-  script(src='js/script.js')
