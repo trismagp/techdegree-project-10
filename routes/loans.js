@@ -43,22 +43,19 @@ router.post('/', function(req, res, next) {
 });
 
 function renderNewLoanForm(req, res, next, loan, errors){
-  Book.findAll().then(function(books){
-    Patron.findAll().then(function(patrons){
-      res.render(
-        "loans/new",
-        {
-          loan: loan,
-          books: books,
-          patrons:patrons,
-          button_text: "Create New Loan",
-          title: "New Loan",
-          errors: errors
-        }
-      );
-    }).catch(function(err){
-      res.send(500);
-    })
+  Promise.all([Book.findAll(),Patron.findAll()]).then(function(data){
+    console.log(data);
+    res.render(
+      "loans/new",
+      {
+        loan: loan,
+        books: data[0],
+        patrons:data[1],
+        button_text: "Create New Loan",
+        title: "New Loan",
+        errors: errors
+      }
+    );
   }).catch(function(err){
     res.send(500);
   })
