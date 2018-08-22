@@ -46,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
   };
 
 
-  Book.findAndCountAllFilter = function(bookIdsParam, title, author, genre, year, offset, limit){
+  Book.findAndCountAllFilter = function(activeLoansBookIds, title, author, genre, year, offset, limit){
     let yearStart = -10000;
     let yearEnd = 10000;
     if(year !== undefined){
@@ -55,10 +55,16 @@ module.exports = (sequelize, DataTypes) => {
     }
 
 
-    return Book.max('id').then(books =>{
-      let bookIds = bookIdsParam;
-      if(bookIdsParam.length === 0 ){
-        bookIds = [...Array(books+1).keys()];
+    return Book.max('id').then(maxBookId =>{
+      // activeLoansBookIds equals to
+      // []: if no filter (overdue or checkedout) is selected, which means length === 0
+      // [-1]: if a filter is selected but there's no active loan related, will filter out all books
+      // or will contain the book ids for the active loans related to filter
+      let booksIdsToDisplay = activeLoansBookIds;
+      if(activeLoansBookIds.length === 0 ){
+        // list all the the book ids from 1 to maxBookId included
+        // [1, 2, 3, ....., maxBookId]
+        booksIdsToDisplay = [...Array(maxBookId + 1).keys()];
       }
 
       return Book.findAndCountAll({
@@ -66,7 +72,7 @@ module.exports = (sequelize, DataTypes) => {
          [sequelize.Op.and]: [
            {
              id: {
-               [sequelize.Op.in]: bookIds
+               [sequelize.Op.in]: booksIdsToDisplay
              }
            },
           {

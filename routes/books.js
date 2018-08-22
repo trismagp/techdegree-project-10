@@ -27,23 +27,23 @@ router.get('/', function(req, res, next) {
 
   Loan.getLoans(req.query.filter).then(function(filteredLoans){
 
-    let bookIds = [];
+    // activeLoansBookIds equals to
+    // []: if no filter (overdue or checkedout) is selected
+    // [-1]: if a filter is selected but there's no active loan related
+    // or will contain the book ids for the active loans related to filter
+    let activeLoansBookIds = [];
     if (["checkedout","overdue"].indexOf(req.query.filter)>-1) {
-      console.log(req.query.filter);
-      console.log(filteredLoans);
       if(filteredLoans.length !== 0 ){
-          bookIds = filteredLoans.map(loan => loan.dataValues.Book.dataValues.id);
+        activeLoansBookIds = filteredLoans.map(loan => loan.dataValues.Book.dataValues.id);
       }else{
-        bookIds = [-1];
+        // if no active loan for overdue or checkedout, [-1] will filter out all books
+        // in Book.findAndCountAllFilter
+        activeLoansBookIds = [-1];
       }
-
-      console.log("=====================");
-      console.log(bookIds);
-      console.log("=====================");
     }
 
     Book.findAndCountAllFilter(
-      bookIds,
+      activeLoansBookIds,
       replaceAll(req.query.title,"%"," "),
       replaceAll(req.query.author,"%"," "),
       replaceAll(req.query.genre,"%"," "),
