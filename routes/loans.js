@@ -44,7 +44,7 @@ router.post('/', function(req, res, next) {
 
 function renderNewLoanForm(req, res, next, loan, errors){
   Promise.all([Book.findAll(),Patron.findAll()]).then(function(data){
-    console.log(data);
+    
     res.render(
       "loans/new",
       {
