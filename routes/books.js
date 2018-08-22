@@ -27,7 +27,7 @@ router.get('/', function(req, res, next) {
 
   Loan.getLoans(req.query.filter).then(function(filteredLoans){
 
-    // activeLoansBookIds equals to
+        // activeLoansBookIds equals to
     // []: if no filter (overdue or checkedout) is selected
     // [-1]: if a filter is selected but there's no active loan related
     // or will contain the book ids for the active loans related to filter
@@ -41,6 +41,12 @@ router.get('/', function(req, res, next) {
         activeLoansBookIds = [-1];
       }
     }
+
+    let pageTitle = "Books"
+    console.log(req.query.filter);
+    if(req.query.filter === "checkedout") pageTitle = "Checked Out Books";
+    if(req.query.filter === "overdue") pageTitle = "Overdue Books";
+
 
     Book.findAndCountAllFilter(
       activeLoansBookIds,
@@ -59,7 +65,7 @@ router.get('/', function(req, res, next) {
           search_author: replaceAll(req.query.author,"%"," "),
           search_genre: replaceAll(req.query.genre,"%"," "),
           search_year: replaceAll(req.query.year,"%"," "),
-          title: "Books",
+          title: pageTitle,
           page_num: queryPage,
           nb_pages: [...Array(Math.ceil(books.count / nbLinesPerPage)).keys()]
         }
