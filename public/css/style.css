@@ -116,3 +116,8 @@ input[type=text], select {
       background-color: #4ba6c3;
       color: #fff;
     }
+
+.errors {
+  color: tomato;
+  font-size: .8em;
+}

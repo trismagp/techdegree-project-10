@@ -27,10 +27,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATEONLY,
       validate: {
         notEmpty: {
-          msg: "Loaned On is required"
+          msg: "Loan On is required"
         },
         isDate: {
-          msg: "Loaned On must be a date"
+          msg: "Loan On must be a date"
         }
       }
     },
@@ -38,10 +38,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATEONLY,
       validate: {
         notEmpty: {
-          msg: "Loaned On is required"
+          msg: "Return by is required"
         },
         isDate: {
-          msg: "Loaned On must be a date"
+          msg: "Return by must be a date"
         }
       }
     },
