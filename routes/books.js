@@ -14,6 +14,9 @@ function replaceAll(text,oldText,newText){
   return "";
 }
 
+
+
+
 /* GET books listing. */
 router.get('/', function(req, res, next) {
 
@@ -22,42 +25,52 @@ router.get('/', function(req, res, next) {
     queryPage = req.query.page;
   }
 
-    Loan.getLoans(req.query.filter).then(function(filteredLoans){
+  Loan.getLoans(req.query.filter).then(function(filteredLoans){
 
-      let bookIds = [];
-      if (["checkedout","overdue"].indexOf(req.query.filter)>-1) {
-        bookIds = filteredLoans.map(loan => loan.dataValues.Book.dataValues.id);
+    let bookIds = [];
+    if (["checkedout","overdue"].indexOf(req.query.filter)>-1) {
+      console.log(req.query.filter);
+      console.log(filteredLoans);
+      if(filteredLoans.length !== 0 ){
+          bookIds = filteredLoans.map(loan => loan.dataValues.Book.dataValues.id);
+      }else{
+        bookIds = [-1];
       }
 
-      Book.findAndCountAllFilter(
-        bookIds,
-        replaceAll(req.query.title,"%"," "),
-        replaceAll(req.query.author,"%"," "),
-        replaceAll(req.query.genre,"%"," "),
-        req.query.year ,
-        parseInt(queryPage)-1,
-        nbLinesPerPage
-      ).then(books => {
-        res.render(
-          "books/index",
-          {
-            books: books.rows,
-            search_title: replaceAll(req.query.title,"%"," "),
-            search_author: replaceAll(req.query.author,"%"," "),
-            search_genre: replaceAll(req.query.genre,"%"," "),
-            search_year: replaceAll(req.query.year,"%"," "),
-            title: "Books",
-            page_num: queryPage,
-            nb_pages: [...Array(Math.ceil(books.count / nbLinesPerPage)).keys()]
-          }
-        );
-      }).catch(function(err){
-        res.send(500);
-      });
+      console.log("=====================");
+      console.log(bookIds);
+      console.log("=====================");
+    }
 
+    Book.findAndCountAllFilter(
+      bookIds,
+      replaceAll(req.query.title,"%"," "),
+      replaceAll(req.query.author,"%"," "),
+      replaceAll(req.query.genre,"%"," "),
+      req.query.year ,
+      parseInt(queryPage)-1,
+      nbLinesPerPage
+    ).then(books => {
+      res.render(
+        "books/index",
+        {
+          books: books.rows,
+          search_title: replaceAll(req.query.title,"%"," "),
+          search_author: replaceAll(req.query.author,"%"," "),
+          search_genre: replaceAll(req.query.genre,"%"," "),
+          search_year: replaceAll(req.query.year,"%"," "),
+          title: "Books",
+          page_num: queryPage,
+          nb_pages: [...Array(Math.ceil(books.count / nbLinesPerPage)).keys()]
+        }
+      );
     }).catch(function(err){
       res.send(500);
     });
+
+  }).catch(function(err){
+    res.send(500);
+  });
 
 });
 
